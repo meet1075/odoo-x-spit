@@ -5,8 +5,8 @@ import { LogIn, UserPlus } from 'lucide-react'
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true)
   const [formData, setFormData] = useState({
-    email: 'demo@stockmaster.com',
-    password: 'demo123',
+    email: '',
+    password: '',
     name: '',
     role: 'manager'
   })
@@ -43,19 +43,19 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
-        <div className="bg-primary-600 text-white p-8 text-center">
+        <div className="bg-slate-800 border-b border-slate-700 text-slate-100 p-8 text-center">
           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-4xl">🏭</span>
           </div>
-          <h1 className="text-3xl font-bold">StockMaster</h1>
-          <p className="text-primary-100 mt-2">Inventory Management System</p>
+          <h1 className="text-3xl font-bold text-slate-100">StockMaster</h1>
+          <p className="text-slate-400 mt-2">Inventory Management System</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b">
+        <div className="flex border-b border-slate-800">
           <button
             onClick={() => {
               setIsLogin(true)
@@ -63,8 +63,8 @@ const Login = () => {
             }}
             className={`flex-1 py-4 text-center font-medium transition-colors ${
               isLogin
-                ? 'text-primary-600 border-b-2 border-primary-600'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-slate-100 border-b-2 border-slate-500'
+                : 'text-slate-500 hover:text-slate-300'
             }`}
           >
             <LogIn className="w-5 h-5 inline mr-2" />
@@ -79,7 +79,7 @@ const Login = () => {
             className={`flex-1 py-4 text-center font-medium transition-colors ${
               !isLogin
                 ? 'text-primary-600 border-b-2 border-primary-600'
-                : 'text-gray-500 hover:text-gray-700'
+                : 'text-slate-400 hover:text-slate-300'
             }`}
           >
             <UserPlus className="w-5 h-5 inline mr-2" />
@@ -90,14 +90,14 @@ const Login = () => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-8">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            <div className="mb-4 p-3 bg-rose-950/30 border border-rose-800 text-rose-300 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           {!isLogin && (
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
                 Full Name
               </label>
               <input
@@ -113,7 +113,7 @@ const Login = () => {
           )}
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Email Address
             </label>
             <input
@@ -128,7 +128,7 @@ const Login = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Password
             </label>
             <input
@@ -144,7 +144,7 @@ const Login = () => {
 
           {!isLogin && (
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
                 Role
               </label>
               <select
@@ -165,32 +165,12 @@ const Login = () => {
           </button>
 
           {isLogin && (
-            <div className="mt-4 space-y-3">
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800 font-medium mb-2 flex items-center gap-2">
-                  <span>👨‍💼</span> Manager Demo Account
-                </p>
-                <p className="text-xs text-blue-700">
-                  <strong>Email:</strong> demo@stockmaster.com<br />
-                  <strong>Password:</strong> demo123
-                </p>
-                <p className="text-xs text-blue-600 mt-2">
-                  Full admin access • All features
-                </p>
-              </div>
-
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <p className="text-sm text-green-800 font-medium mb-2 flex items-center gap-2">
-                  <span>🧑‍🏭</span> Staff Demo Account
-                </p>
-                <p className="text-xs text-green-700">
-                  <strong>Email:</strong> staff@stockmaster.com<br />
-                  <strong>Password:</strong> staff123
-                </p>
-                <p className="text-xs text-green-600 mt-2">
-                  Task-focused • Operational access
-                </p>
-              </div>
+            <div className="mt-4 p-4 bg-slate-900/40 border border-slate-800 rounded-lg text-xs text-slate-400">
+              <p>
+                Need access? Sign in with your company credentials. New here? Switch to
+                <span className="font-medium text-slate-200"> Sign Up </span>
+                or contact your administrator to get started.
+              </p>
             </div>
           )}
         </form>

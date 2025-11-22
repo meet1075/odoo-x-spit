@@ -219,7 +219,7 @@ const Settings = () => {
                         <PermissionGuard permission={PERMISSIONS.MANAGE_WAREHOUSES}>
                           <button
                             onClick={() => openWarehouseModal(warehouse)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-cyan-400 hover:bg-cyan-950/30 rounded-lg transition-colors"
                             title="Edit Warehouse"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -244,7 +244,7 @@ const Settings = () => {
 
           {/* Data Management */}
           <PermissionGuard permission={PERMISSIONS.RESET_DATA}>
-            <div className="lg:col-span-3 card bg-yellow-50 border border-yellow-200">
+            <div className="lg:col-span-3 card bg-amber-950/20 border border-amber-800">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
                 <Database className="w-6 h-6 text-yellow-600" />

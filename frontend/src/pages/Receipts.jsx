@@ -106,7 +106,7 @@ const Receipts = () => {
     <Layout>
       <div className="p-8">
         {successMessage && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg flex items-center gap-2 animate-pulse">
+          <div className="mb-4 p-4 bg-emerald-950/30 border border-emerald-800 text-emerald-300 rounded-lg flex items-center gap-2 animate-pulse">
             <Check className="w-5 h-5" />
             {successMessage}
           </div>
@@ -114,8 +114,8 @@ const Receipts = () => {
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{user?.role === 'staff' ? 'Receive Goods' : 'Receipts (Incoming Stock)'}</h1>
-            <p className="text-gray-500 mt-1">{user?.role === 'staff' ? 'Process incoming goods from suppliers' : 'Manage incoming goods from suppliers'}</p>
+            <h1 className="text-3xl font-bold text-slate-100">{user?.role === 'staff' ? 'Receive Goods' : 'Receipts (Incoming Stock)'}</h1>
+            <p className="text-slate-400 mt-1">{user?.role === 'staff' ? 'Process incoming goods from suppliers' : 'Manage incoming goods from suppliers'}</p>
           </div>
           <PermissionGuard permission={PERMISSIONS.CREATE_RECEIPT}>
             <button onClick={openModal} className="btn btn-primary flex items-center gap-2">
@@ -129,7 +129,7 @@ const Receipts = () => {
           <button
             onClick={() => setShowCompleted(false)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              !showCompleted ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              !showCompleted ? 'bg-primary-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
             }`}
           >
             Pending ({pendingReceipts.length})
@@ -137,7 +137,7 @@ const Receipts = () => {
           <button
             onClick={() => setShowCompleted(true)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              showCompleted ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              showCompleted ? 'bg-primary-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
             }`}
           >
             Completed ({completedReceipts.length})
@@ -146,12 +146,12 @@ const Receipts = () => {
 
         {/* Workflow Info for Staff */}
         {user?.role === 'staff' && (
-          <div className="mb-6 card bg-green-50 border border-green-200">
-            <h3 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
+          <div className="mb-6 card bg-emerald-950/20 border border-emerald-800">
+            <h3 className="font-semibold text-emerald-300 mb-2 flex items-center gap-2">
               <Download className="w-5 h-5" />
               Receipt Workflow Guide
             </h3>
-            <div className="flex items-center gap-4 text-sm text-green-800 flex-wrap">
+            <div className="flex items-center gap-4 text-sm text-slate-300 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="badge badge-draft">Draft</span>
                 <span className="text-xs">Created by manager</span>
@@ -172,7 +172,7 @@ const Receipts = () => {
                 <span className="text-xs font-semibold">Stock increases ✓</span>
               </div>
             </div>
-            <p className="text-xs text-green-700 mt-3">
+            <p className="text-xs text-slate-400 mt-3">
               💡 <strong>Your role:</strong> Process receipts through each stage. Validate when goods are received and verified to increase stock.
             </p>
           </div>
@@ -201,7 +201,7 @@ const Receipts = () => {
                   </tr>
                 ) : (
                   (showCompleted ? completedReceipts : pendingReceipts).map((receipt) => (
-                    <tr key={receipt.id} className="border-b hover:bg-gray-50">
+                    <tr key={receipt.id} className="border-b border-slate-800 hover:bg-slate-800">
                       <td className="py-3 px-4 text-sm font-medium">{receipt.id}</td>
                       <td className="py-3 px-4 text-sm">{receipt.supplier}</td>
                       <td className="py-3 px-4 text-sm">{receipt.warehouse}</td>
@@ -222,7 +222,7 @@ const Receipts = () => {
                             {receipt.status === 'draft' && (
                               <button
                                 onClick={() => handleStatusUpdate(receipt.id, 'waiting')}
-                                className="text-xs px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
+                                className="text-xs px-3 py-1 bg-amber-950/40 text-amber-300 rounded hover:bg-amber-900/60 border border-amber-800"
                               >
                                 Mark Waiting
                               </button>
@@ -230,7 +230,7 @@ const Receipts = () => {
                             {receipt.status === 'waiting' && (
                               <button
                                 onClick={() => handleStatusUpdate(receipt.id, 'ready')}
-                                className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                                className="text-xs px-3 py-1 bg-cyan-950/40 text-cyan-300 rounded hover:bg-cyan-900/60 border border-cyan-800"
                               >
                                 Mark Ready
                               </button>
@@ -238,7 +238,7 @@ const Receipts = () => {
                             {receipt.status === 'ready' && (
                               <button
                                 onClick={() => handleStatusUpdate(receipt.id, 'done')}
-                                className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 flex items-center gap-1"
+                                className="text-xs px-3 py-1 bg-emerald-950/40 text-emerald-300 rounded hover:bg-emerald-900/60 border border-emerald-800 flex items-center gap-1"
                               >
                                 <Check className="w-3 h-3" />
                                 Validate
@@ -246,7 +246,7 @@ const Receipts = () => {
                             )}
                             <button
                               onClick={() => handleStatusUpdate(receipt.id, 'canceled')}
-                              className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 flex items-center gap-1"
+                              className="text-xs px-3 py-1 bg-rose-950/40 text-rose-300 rounded hover:bg-rose-900/60 border border-rose-800 flex items-center gap-1"
                             >
                               <X className="w-3 h-3" />
                               Cancel

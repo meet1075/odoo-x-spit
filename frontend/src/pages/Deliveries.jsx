@@ -112,7 +112,7 @@ const Deliveries = () => {
     <Layout>
       <div className="p-8">
         {successMessage && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg flex items-center gap-2 animate-pulse">
+          <div className="mb-4 p-4 bg-emerald-950/30 border border-emerald-800 text-emerald-300 rounded-lg flex items-center gap-2 animate-pulse">
             <Check className="w-5 h-5" />
             {successMessage}
           </div>
@@ -120,8 +120,8 @@ const Deliveries = () => {
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{user?.role === 'staff' ? 'Pick & Pack' : 'Deliveries (Outgoing Stock)'}</h1>
-            <p className="text-gray-500 mt-1">{user?.role === 'staff' ? 'Pick, pack and ship orders to customers' : 'Manage outgoing deliveries to customers'}</p>
+            <h1 className="text-3xl font-bold text-slate-100">{user?.role === 'staff' ? 'Pick & Pack' : 'Deliveries (Outgoing Stock)'}</h1>
+            <p className="text-slate-400 mt-1">{user?.role === 'staff' ? 'Pick, pack and ship orders to customers' : 'Manage outgoing deliveries to customers'}</p>
           </div>
           <PermissionGuard permission={PERMISSIONS.CREATE_DELIVERY}>
             <button onClick={openModal} className="btn btn-primary flex items-center gap-2">
@@ -135,7 +135,7 @@ const Deliveries = () => {
           <button
             onClick={() => setShowCompleted(false)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              !showCompleted ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              !showCompleted ? 'bg-primary-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
             }`}
           >
             Pending ({pendingDeliveries.length})
@@ -143,7 +143,7 @@ const Deliveries = () => {
           <button
             onClick={() => setShowCompleted(true)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              showCompleted ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              showCompleted ? 'bg-primary-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
             }`}
           >
             Completed ({completedDeliveries.length})
@@ -173,7 +173,7 @@ const Deliveries = () => {
                   </tr>
                 ) : (
                   (showCompleted ? completedDeliveries : pendingDeliveries).map((delivery) => (
-                    <tr key={delivery.id} className="border-b hover:bg-gray-50">
+                    <tr key={delivery.id} className="border-b border-slate-800 hover:bg-slate-800">
                       <td className="py-3 px-4 text-sm font-medium">{delivery.id}</td>
                       <td className="py-3 px-4 text-sm">{delivery.customer}</td>
                       <td className="py-3 px-4 text-sm">{delivery.warehouse}</td>
@@ -194,7 +194,7 @@ const Deliveries = () => {
                             {delivery.status === 'draft' && (
                               <button
                                 onClick={() => handleStatusUpdate(delivery.id, 'waiting')}
-                                className="text-xs px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
+                                className="text-xs px-3 py-1 bg-amber-950/40 text-amber-300 rounded hover:bg-amber-900/60 border border-amber-800"
                                 title="Pick Items"
                               >
                                 Pick
@@ -203,7 +203,7 @@ const Deliveries = () => {
                             {delivery.status === 'waiting' && (
                               <button
                                 onClick={() => handleStatusUpdate(delivery.id, 'ready')}
-                                className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                                className="text-xs px-3 py-1 bg-cyan-950/40 text-cyan-300 rounded hover:bg-cyan-900/60 border border-cyan-800"
                                 title="Pack Items"
                               >
                                 Pack
@@ -212,7 +212,7 @@ const Deliveries = () => {
                             {delivery.status === 'ready' && (
                               <button
                                 onClick={() => handleStatusUpdate(delivery.id, 'done')}
-                                className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 flex items-center gap-1"
+                                className="text-xs px-3 py-1 bg-emerald-950/40 text-emerald-300 rounded hover:bg-emerald-900/60 border border-emerald-800 flex items-center gap-1"
                                 title="Validate Delivery"
                               >
                                 <Check className="w-3 h-3" />
@@ -221,7 +221,7 @@ const Deliveries = () => {
                             )}
                             <button
                               onClick={() => handleStatusUpdate(delivery.id, 'canceled')}
-                              className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 flex items-center gap-1"
+                              className="text-xs px-3 py-1 bg-rose-950/40 text-rose-300 rounded hover:bg-rose-900/60 border border-rose-800 flex items-center gap-1"
                             >
                               <X className="w-3 h-3" />
                               Cancel
@@ -241,12 +241,12 @@ const Deliveries = () => {
         </div>
 
         {/* Workflow Info */}
-        <div className={`mt-6 card border ${user?.role === 'staff' ? 'bg-orange-50 border-orange-200' : 'bg-blue-50 border-blue-200'}`}>
-          <h3 className={`font-semibold mb-2 flex items-center gap-2 ${user?.role === 'staff' ? 'text-orange-900' : 'text-blue-900'}`}>
+        <div className={`mt-6 card border ${user?.role === 'staff' ? 'bg-amber-950/20 border-amber-800' : 'bg-cyan-950/20 border-cyan-800'}`}>
+          <h3 className={`font-semibold mb-2 flex items-center gap-2 ${user?.role === 'staff' ? 'text-amber-300' : 'text-cyan-300'}`}>
             <Package className="w-5 h-5" />
             {user?.role === 'staff' ? 'Pick & Pack Workflow Guide' : 'Delivery Workflow'}
           </h3>
-          <div className={`flex items-center gap-4 text-sm flex-wrap ${user?.role === 'staff' ? 'text-orange-800' : 'text-blue-800'}`}>
+          <div className={`flex items-center gap-4 text-sm flex-wrap ${user?.role === 'staff' ? 'text-slate-300' : 'text-slate-300'}`}>
             <div className="flex items-center gap-2">
               <span className="badge badge-draft">Draft</span>
               <span className="text-xs">{user?.role === 'staff' ? 'Created by manager' : 'Created'}</span>
@@ -268,7 +268,7 @@ const Deliveries = () => {
             </div>
           </div>
           {user?.role === 'staff' && (
-            <p className="text-xs text-orange-700 mt-3">
+            <p className="text-xs text-slate-400 mt-3">
               💡 <strong>Your role:</strong> Pick items from warehouse, pack them securely, then validate to complete delivery and decrease stock.
             </p>
           )}

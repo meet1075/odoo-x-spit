@@ -18,11 +18,11 @@ const History = () => {
   }
 
   const getActionColor = (action) => {
-    if (action === 'create') return 'text-green-600 bg-green-100'
-    if (action === 'update') return 'text-blue-600 bg-blue-100'
-    if (action === 'delete') return 'text-red-600 bg-red-100'
-    if (action === 'move') return 'text-purple-600 bg-purple-100'
-    return 'text-gray-600 bg-gray-100'
+    if (action === 'create') return 'text-emerald-400 bg-emerald-950/40 border border-emerald-800'
+    if (action === 'update') return 'text-cyan-400 bg-cyan-950/40 border border-cyan-800'
+    if (action === 'delete') return 'text-rose-400 bg-rose-950/40 border border-rose-800'
+    if (action === 'move') return 'text-violet-400 bg-violet-950/40 border border-violet-800'
+    return 'text-slate-400 bg-slate-800 border border-slate-700'
   }
 
   const getActionLabel = (action) => {
@@ -71,8 +71,8 @@ const History = () => {
     <Layout>
       <div className="p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Move History</h1>
-          <p className="text-gray-500 mt-1">Complete audit trail of all inventory operations</p>
+          <h1 className="text-3xl font-bold text-slate-100">Move History</h1>
+          <p className="text-slate-400 mt-1">Complete audit trail of all inventory operations</p>
         </div>
 
         <div className="card">
@@ -80,9 +80,9 @@ const History = () => {
           <div className="space-y-4">
             {history.length === 0 ? (
               <div className="text-center py-12">
-                <HistoryIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">No history entries yet</p>
-                <p className="text-sm text-gray-400 mt-2">All operations will be logged here</p>
+                <HistoryIcon className="w-16 h-16 text-slate-700 mx-auto mb-4" />
+                <p className="text-slate-400">No history entries yet</p>
+                <p className="text-sm text-slate-500 mt-2">All operations will be logged here</p>
               </div>
             ) : (
               history.map((entry, index) => {
@@ -93,7 +93,7 @@ const History = () => {
                   <div key={entry.id} className="relative flex gap-4 pb-4">
                     {/* Timeline Line */}
                     {!isLast && (
-                      <div className="absolute left-6 top-12 bottom-0 w-0.5 bg-gray-200"></div>
+                      <div className="absolute left-6 top-12 bottom-0 w-0.5 bg-slate-700"></div>
                     )}
 
                     {/* Icon */}
@@ -102,28 +102,28 @@ const History = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                    <div className="flex-1 bg-slate-800 border border-slate-700 rounded-lg p-4 hover:bg-slate-700 transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-white border border-gray-200 mr-2">
+                          <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-slate-900 border border-slate-700 mr-2 text-slate-300">
                             {getActionLabel(entry.action)}
                           </span>
-                          <span className="text-sm font-medium text-gray-700 capitalize">
+                          <span className="text-sm font-medium text-slate-300 capitalize">
                             {entry.type}
                           </span>
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-slate-400">
                           {formatDateTime(entry.timestamp)}
                         </span>
                       </div>
                       
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-300">
                         {renderDataSummary(entry)}
                       </p>
 
                       {/* Data Details */}
                       {entry.data.id && (
-                        <div className="mt-2 text-xs text-gray-500">
+                        <div className="mt-2 text-xs text-slate-500">
                           ID: {entry.data.id}
                         </div>
                       )}
@@ -138,24 +138,24 @@ const History = () => {
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
           <div className="card">
-            <p className="text-sm text-gray-600 mb-1">Total Entries</p>
-            <p className="text-2xl font-bold text-gray-900">{history.length}</p>
+            <p className="text-sm text-slate-400 mb-1">Total Entries</p>
+            <p className="text-2xl font-bold text-slate-100">{history.length}</p>
           </div>
           <div className="card">
-            <p className="text-sm text-gray-600 mb-1">Created</p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-sm text-slate-400 mb-1">Created</p>
+            <p className="text-2xl font-bold text-emerald-400">
               {history.filter(h => h.action === 'create').length}
             </p>
           </div>
           <div className="card">
-            <p className="text-sm text-gray-600 mb-1">Updated</p>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-sm text-slate-400 mb-1">Updated</p>
+            <p className="text-2xl font-bold text-cyan-400">
               {history.filter(h => h.action === 'update').length}
             </p>
           </div>
           <div className="card">
-            <p className="text-sm text-gray-600 mb-1">Moved</p>
-            <p className="text-2xl font-bold text-purple-600">
+            <p className="text-sm text-slate-400 mb-1">Moved</p>
+            <p className="text-2xl font-bold text-violet-400">
               {history.filter(h => h.action === 'move').length}
             </p>
           </div>

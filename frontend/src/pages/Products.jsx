@@ -181,7 +181,7 @@ const Products = () => {
                     <PermissionGuard permission={PERMISSIONS.EDIT_PRODUCT}>
                       <button
                         onClick={() => openModal(product)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-cyan-400 hover:bg-cyan-950/30 rounded-lg transition-colors"
                         title="Edit Product"
                       >
                         <Edit className="w-4 h-4" />
@@ -190,7 +190,7 @@ const Products = () => {
                     <PermissionGuard permission={PERMISSIONS.DELETE_PRODUCT}>
                       <button
                         onClick={() => handleDelete(product.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors"
                         title="Delete Product"
                       >
                         <Trash2 className="w-4 h-4" />

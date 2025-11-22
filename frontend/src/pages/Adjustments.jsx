@@ -92,7 +92,7 @@ const Adjustments = () => {
                   adjustments.map((adjustment) => {
                     const diff = adjustment.newQuantity - adjustment.oldQuantity
                     return (
-                      <tr key={adjustment.id} className="border-b hover:bg-gray-50">
+                      <tr key={adjustment.id} className="border-b border-slate-800 hover:bg-slate-800">
                         <td className="py-3 px-4 text-sm font-medium">{adjustment.id}</td>
                         <td className="py-3 px-4 text-sm">{adjustment.productName}</td>
                         <td className="py-3 px-4 text-sm">{adjustment.warehouse}</td>
@@ -117,12 +117,12 @@ const Adjustments = () => {
         </div>
 
         {/* Info Card */}
-        <div className="mt-6 card bg-yellow-50 border border-yellow-200">
-          <h3 className="font-semibold text-yellow-900 mb-2 flex items-center gap-2">
+        <div className="mt-6 card bg-amber-950/20 border border-amber-800">
+          <h3 className="font-semibold text-amber-300 mb-2 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" />
             When to Use Stock Adjustments
           </h3>
-          <ul className="text-sm text-yellow-800 space-y-1">
+          <ul className="text-sm text-slate-300 space-y-1">
             <li>• <strong>Physical Count Discrepancies:</strong> When physical inventory doesn't match system records</li>
             <li>• <strong>Damaged Items:</strong> Record losses due to damage or expiration</li>
             <li>• <strong>Theft or Loss:</strong> Document missing inventory</li>
@@ -159,8 +159,8 @@ const Adjustments = () => {
             </div>
 
             {selectedProduct && formData.warehouse && (
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-900">
+              <div className="p-4 bg-cyan-950/30 rounded-lg border border-cyan-800">
+                <p className="text-sm text-slate-300">
                   <strong>Current Stock in {formData.warehouse}:</strong> {currentStock} {selectedProduct.unitOfMeasure}
                 </p>
               </div>
@@ -203,16 +203,16 @@ const Adjustments = () => {
             {selectedProduct && formData.warehouse && formData.newQuantity !== currentStock && (
               <div className={`p-4 rounded-lg border ${
                 difference > 0 
-                  ? 'bg-green-50 border-green-200' 
-                  : 'bg-red-50 border-red-200'
+                  ? 'bg-emerald-950/30 border-emerald-800' 
+                  : 'bg-rose-950/30 border-rose-800'
               }`}>
                 <p className={`text-sm font-semibold ${
-                  difference > 0 ? 'text-green-900' : 'text-red-900'
+                  difference > 0 ? 'text-emerald-300' : 'text-rose-300'
                 }`}>
                   Difference: {difference > 0 ? '+' : ''}{difference} {selectedProduct.unitOfMeasure}
                 </p>
                 <p className={`text-xs mt-1 ${
-                  difference > 0 ? 'text-green-700' : 'text-red-700'
+                  difference > 0 ? 'text-slate-400' : 'text-slate-400'
                 }`}>
                   {difference > 0 
                     ? 'Stock will be increased in this warehouse' 

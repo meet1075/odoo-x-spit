@@ -74,7 +74,7 @@ const Transfers = () => {
     <Layout>
       <div className="p-8">
         {successMessage && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg flex items-center gap-2 animate-pulse">
+          <div className="mb-4 p-4 bg-emerald-950/30 border border-emerald-800 text-emerald-300 rounded-lg flex items-center gap-2 animate-pulse">
             <Check className="w-5 h-5" />
             {successMessage}
           </div>
@@ -103,7 +103,7 @@ const Transfers = () => {
           <button
             onClick={() => setShowCompleted(false)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              !showCompleted ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              !showCompleted ? 'bg-primary-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
             }`}
           >
             Pending ({pendingTransfers.length})
@@ -111,7 +111,7 @@ const Transfers = () => {
           <button
             onClick={() => setShowCompleted(true)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              showCompleted ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              showCompleted ? 'bg-primary-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
             }`}
           >
             Completed ({completedTransfers.length})
@@ -120,12 +120,12 @@ const Transfers = () => {
 
         {/* Workflow Info for Staff */}
         {user?.role === 'staff' && (
-          <div className="mb-6 card bg-purple-50 border border-purple-200">
-            <h3 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+          <div className="mb-6 card bg-violet-950/20 border border-violet-800">
+            <h3 className="font-semibold text-violet-300 mb-2 flex items-center gap-2">
               <Repeat className="w-5 h-5" />
               Transfer Workflow Guide
             </h3>
-            <div className="flex items-center gap-4 text-sm text-purple-800 flex-wrap">
+            <div className="flex items-center gap-4 text-sm text-slate-300 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="badge badge-draft">Draft</span>
                 <span className="text-xs">Created by manager</span>
@@ -146,7 +146,7 @@ const Transfers = () => {
                 <span className="text-xs font-semibold">Stock locations updated ✓</span>
               </div>
             </div>
-            <p className="text-xs text-purple-700 mt-3">
+            <p className="text-xs text-slate-400 mt-3">
               💡 <strong>Your role:</strong> Execute transfers by moving items between locations and confirm completion.
             </p>
           </div>
@@ -175,7 +175,7 @@ const Transfers = () => {
                   </tr>
                 ) : (
                   (showCompleted ? completedTransfers : pendingTransfers).map((transfer) => (
-                    <tr key={transfer.id} className="border-b hover:bg-gray-50">
+                    <tr key={transfer.id} className="border-b border-slate-800 hover:bg-slate-800">
                       <td className="py-3 px-4 text-sm font-medium">{transfer.id}</td>
                       <td className="py-3 px-4 text-sm">{transfer.productName}</td>
                       <td className="py-3 px-4 text-sm font-semibold">{transfer.quantity}</td>
@@ -204,7 +204,7 @@ const Transfers = () => {
                             {transfer.status === 'draft' && (
                               <button
                                 onClick={() => handleStatusUpdate(transfer.id, 'waiting')}
-                                className="text-xs px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
+                                className="text-xs px-3 py-1 bg-amber-950/40 text-amber-300 rounded hover:bg-amber-900/60 border border-amber-800"
                               >
                                 Start Transfer
                               </button>
@@ -212,7 +212,7 @@ const Transfers = () => {
                             {transfer.status === 'waiting' && (
                               <button
                                 onClick={() => handleStatusUpdate(transfer.id, 'ready')}
-                                className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                                className="text-xs px-3 py-1 bg-cyan-950/40 text-cyan-300 rounded hover:bg-cyan-900/60 border border-cyan-800"
                               >
                                 Mark Ready
                               </button>
@@ -220,7 +220,7 @@ const Transfers = () => {
                             {transfer.status === 'ready' && (
                               <button
                                 onClick={() => handleStatusUpdate(transfer.id, 'done')}
-                                className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 flex items-center gap-1"
+                                className="text-xs px-3 py-1 bg-emerald-950/40 text-emerald-300 rounded hover:bg-emerald-900/60 border border-emerald-800 flex items-center gap-1"
                               >
                                 <Check className="w-3 h-3" />
                                 Complete
@@ -228,7 +228,7 @@ const Transfers = () => {
                             )}
                             <button
                               onClick={() => handleStatusUpdate(transfer.id, 'canceled')}
-                              className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 flex items-center gap-1"
+                              className="text-xs px-3 py-1 bg-rose-950/40 text-rose-300 rounded hover:bg-rose-900/60 border border-rose-800 flex items-center gap-1"
                             >
                               <X className="w-3 h-3" />
                               Cancel
@@ -249,12 +249,12 @@ const Transfers = () => {
 
         {/* Info Card - Only for Manager */}
         {user?.role === 'manager' && (
-          <div className="mt-6 card bg-purple-50 border border-purple-200">
-            <h3 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+          <div className="mt-6 card bg-violet-950/20 border border-violet-800">
+            <h3 className="font-semibold text-violet-300 mb-2 flex items-center gap-2">
               <Repeat className="w-5 h-5" />
               How Internal Transfers Work
             </h3>
-            <ul className="text-sm text-purple-800 space-y-1">
+            <ul className="text-sm text-slate-300 space-y-1">
               <li>• Move stock between warehouses or specific locations</li>
               <li>• Total stock quantity remains unchanged</li>
               <li>• Stock locations are updated when transfer is completed by staff</li>
@@ -336,8 +336,8 @@ const Transfers = () => {
               </select>
             </div>
 
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-800">
+            <div className="p-4 bg-cyan-950/30 rounded-lg border border-cyan-800">
+              <p className="text-sm text-slate-300">
                 <strong>Note:</strong> This transfer will move the selected quantity from{' '}
                 <strong>{formData.fromLocation}</strong> to <strong>{formData.toLocation}</strong>.
                 The total inventory will remain the same.
