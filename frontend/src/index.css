@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950;
+  }
+  
+  .btn-primary {
+    @apply bg-slate-700 text-white hover:bg-slate-600 focus:ring-slate-500 border border-slate-600;
+  }
+  
+  .btn-secondary {
+    @apply bg-slate-800 text-slate-300 hover:bg-slate-700 focus:ring-slate-600 border border-slate-700;
+  }
+  
+  .btn-success {
+    @apply bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500 border border-emerald-500;
+  }
+  
+  .btn-danger {
+    @apply bg-rose-600 text-white hover:bg-rose-500 focus:ring-rose-500 border border-rose-500;
+  }
+  
+  .input {
+    @apply w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-slate-500 focus:border-slate-500;
+  }
+  
+  .card {
+    @apply bg-slate-900 rounded-lg shadow-xl border border-slate-800 p-6;
+  }
+  
+  .badge {
+    @apply px-3 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .badge-draft {
+    @apply bg-slate-800 text-slate-300 border border-slate-700;
+  }
+  
+  .badge-waiting {
+    @apply bg-amber-900/50 text-amber-300 border border-amber-700;
+  }
+  
+  .badge-ready {
+    @apply bg-cyan-900/50 text-cyan-300 border border-cyan-700;
+  }
+  
+  .badge-done {
+    @apply bg-emerald-900/50 text-emerald-300 border border-emerald-700;
+  }
+  
+  .badge-canceled {
+    @apply bg-rose-900/50 text-rose-300 border border-rose-700;
+  }
+}
