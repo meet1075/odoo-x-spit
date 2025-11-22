@@ -6,11 +6,11 @@ import { formatDateTime } from '../utils/storage'
 import { Plus, AlertTriangle } from 'lucide-react'
 
 const Adjustments = () => {
-  const { adjustments, products, addAdjustment } = useData()
+  const { adjustments, products, warehouses, addAdjustment } = useData()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formData, setFormData] = useState({
     productId: '',
-    location: 'Main Warehouse',
+    warehouse: '',
     newQuantity: 0,
     reason: ''
   })
@@ -19,11 +19,13 @@ const Adjustments = () => {
     e.preventDefault()
     
     const product = products.find(p => p.id === formData.productId)
+    const warehouseEntry = product?.warehouses?.find(wh => wh.warehouseName === formData.warehouse)
+    const currentStock = warehouseEntry?.stock || 0
     
     addAdjustment({
       ...formData,
       productName: product?.name || '',
-      oldQuantity: product?.stock || 0,
+      oldQuantity: currentStock,
       newQuantity: parseInt(formData.newQuantity),
       date: new Date().toISOString()
     })
@@ -34,7 +36,7 @@ const Adjustments = () => {
   const openModal = () => {
     setFormData({
       productId: '',
-      location: 'Main Warehouse',
+      warehouse: warehouses.length > 0 ? warehouses[0].name : '',
       newQuantity: 0,
       reason: ''
     })
@@ -46,7 +48,9 @@ const Adjustments = () => {
   }
 
   const selectedProduct = products.find(p => p.id === formData.productId)
-  const difference = selectedProduct ? formData.newQuantity - selectedProduct.stock : 0
+  const selectedWarehouseEntry = selectedProduct?.warehouses?.find(wh => wh.warehouseName === formData.warehouse)
+  const currentStock = selectedWarehouseEntry?.stock || 0
+  const difference = selectedProduct ? formData.newQuantity - currentStock : 0
 
   return (
     <Layout>
@@ -69,7 +73,7 @@ const Adjustments = () => {
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Adjustment ID</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Product</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Location</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Warehouse</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Old Qty</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">New Qty</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Difference</th>
@@ -91,7 +95,7 @@ const Adjustments = () => {
                       <tr key={adjustment.id} className="border-b hover:bg-gray-50">
                         <td className="py-3 px-4 text-sm font-medium">{adjustment.id}</td>
                         <td className="py-3 px-4 text-sm">{adjustment.productName}</td>
-                        <td className="py-3 px-4 text-sm">{adjustment.location}</td>
+                        <td className="py-3 px-4 text-sm">{adjustment.warehouse}</td>
                         <td className="py-3 px-4 text-sm">{adjustment.oldQuantity}</td>
                         <td className="py-3 px-4 text-sm font-semibold">{adjustment.newQuantity}</td>
                         <td className="py-3 px-4">
@@ -143,35 +147,41 @@ const Adjustments = () => {
                 required
               >
                 <option value="">Select Product</option>
-                {products.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.sku}) - Current Stock: {p.stock}
-                  </option>
-                ))}
+                {products.map(p => {
+                  const totalStock = p.warehouses?.reduce((sum, wh) => sum + wh.stock, 0) || 0
+                  return (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.sku}) - Total Stock: {totalStock}
+                    </option>
+                  )
+                })}
               </select>
             </div>
 
-            {selectedProduct && (
+            {selectedProduct && formData.warehouse && (
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-900">
-                  <strong>Current Stock:</strong> {selectedProduct.stock} {selectedProduct.unitOfMeasure}
+                  <strong>Current Stock in {formData.warehouse}:</strong> {currentStock} {selectedProduct.unitOfMeasure}
                 </p>
               </div>
             )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location *
+                Warehouse *
               </label>
               <select
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                value={formData.warehouse}
+                onChange={(e) => setFormData({ ...formData, warehouse: e.target.value })}
                 className="input"
                 required
               >
-                <option value="Main Warehouse">Main Warehouse</option>
-                <option value="Production Floor">Production Floor</option>
-                <option value="Warehouse 2">Warehouse 2</option>
+                <option value="">Select warehouse</option>
+                {warehouses.map((warehouse) => (
+                  <option key={warehouse.id} value={warehouse.name}>
+                    {warehouse.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -190,7 +200,7 @@ const Adjustments = () => {
               />
             </div>
 
-            {selectedProduct && formData.newQuantity !== selectedProduct.stock && (
+            {selectedProduct && formData.warehouse && formData.newQuantity !== currentStock && (
               <div className={`p-4 rounded-lg border ${
                 difference > 0 
                   ? 'bg-green-50 border-green-200' 
@@ -205,8 +215,8 @@ const Adjustments = () => {
                   difference > 0 ? 'text-green-700' : 'text-red-700'
                 }`}>
                   {difference > 0 
-                    ? 'Stock will be increased' 
-                    : 'Stock will be decreased'}
+                    ? 'Stock will be increased in this warehouse' 
+                    : 'Stock will be decreased in this warehouse'}
                 </p>
               </div>
             )}

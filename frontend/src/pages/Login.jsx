@@ -13,24 +13,28 @@ const Login = () => {
   const [error, setError] = useState('')
   const { login, signup } = useAuth()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (isLogin) {
-      const result = login(formData.email, formData.password)
-      if (!result.success) {
-        setError(result.message)
+    try {
+      if (isLogin) {
+        const result = await login(formData.email, formData.password)
+        if (!result.success) {
+          setError(result.message || 'Login failed')
+        }
+      } else {
+        if (!formData.name || !formData.email || !formData.password) {
+          setError('Please fill in all fields')
+          return
+        }
+        const result = await signup(formData.name, formData.email, formData.password, formData.role)
+        if (!result.success) {
+          setError(result.message || 'Registration failed')
+        }
       }
-    } else {
-      if (!formData.name || !formData.email || !formData.password) {
-        setError('Please fill in all fields')
-        return
-      }
-      const result = signup(formData.name, formData.email, formData.password, formData.role)
-      if (!result.success) {
-        setError(result.message)
-      }
+    } catch (error) {
+      setError(error.message || 'An error occurred')
     }
   }
 

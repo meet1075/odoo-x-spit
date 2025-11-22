@@ -11,7 +11,7 @@ import { Plus, Download, Check, X } from 'lucide-react'
 
 const Receipts = () => {
   const { user } = useAuth()
-  const { receipts, products, addReceipt, updateReceipt } = useData()
+  const { receipts, products, warehouses, addReceipt, updateReceipt } = useData()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [showCompleted, setShowCompleted] = useState(false)
@@ -19,7 +19,7 @@ const Receipts = () => {
   const canProcess = hasPermission(user?.role, PERMISSIONS.PROCESS_RECEIPT)
   const [formData, setFormData] = useState({
     supplier: '',
-    warehouse: 'Main Warehouse',
+    warehouse: '',
     items: [{ productId: '', quantity: 0 }]
   })
 
@@ -49,10 +49,17 @@ const Receipts = () => {
   const openModal = () => {
     setFormData({
       supplier: '',
-      warehouse: 'Main Warehouse',
+      warehouse: warehouses.length > 0 ? warehouses[0].name : '',
       items: [{ productId: '', quantity: 0 }]
     })
     setIsModalOpen(true)
+  }
+
+  const handleWarehouseChange = (warehouseName) => {
+    setFormData({
+      ...formData,
+      warehouse: warehouseName
+    })
   }
 
   const closeModal = () => {
@@ -283,13 +290,16 @@ const Receipts = () => {
               </label>
               <select
                 value={formData.warehouse}
-                onChange={(e) => setFormData({ ...formData, warehouse: e.target.value })}
+                onChange={(e) => handleWarehouseChange(e.target.value)}
                 className="input"
                 required
               >
-                <option value="Main Warehouse">Main Warehouse</option>
-                <option value="Production Floor">Production Floor</option>
-                <option value="Warehouse 2">Warehouse 2</option>
+                <option value="">Select warehouse</option>
+                {warehouses.map((warehouse) => (
+                  <option key={warehouse.id} value={warehouse.name}>
+                    {warehouse.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -306,11 +316,14 @@ const Receipts = () => {
                     required
                   >
                     <option value="">Select Product</option>
-                    {products.map(p => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} ({p.sku})
-                      </option>
-                    ))}
+                    {products.map(p => {
+                      const totalStock = p.warehouses?.reduce((sum, wh) => sum + wh.stock, 0) || 0
+                      return (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.sku}) - Total: {totalStock}
+                        </option>
+                      )
+                    })}
                   </select>
                   <input
                     type="number"

@@ -7,11 +7,11 @@ import PermissionGuard from '../components/PermissionGuard'
 import { formatDate, getCategoryName, getStatusColor } from '../utils/storage'
 import { hasPermission } from '../utils/permissions'
 import { PERMISSIONS } from '../utils/permissions'
-import { Plus, Edit, Trash2, Package, Search, AlertCircle } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, Search, AlertCircle, X } from 'lucide-react'
 
 const Products = () => {
   const { user } = useAuth()
-  const { products, addProduct, updateProduct, deleteProduct } = useData()
+  const { products, warehouses, addProduct, updateProduct, deleteProduct } = useData()
   const canEdit = hasPermission(user?.role, PERMISSIONS.EDIT_PRODUCT)
   const canDelete = hasPermission(user?.role, PERMISSIONS.DELETE_PRODUCT)
   const canCreate = hasPermission(user?.role, PERMISSIONS.CREATE_PRODUCT)
@@ -24,25 +24,41 @@ const Products = () => {
     sku: '',
     category: 'raw',
     unitOfMeasure: 'units',
-    stock: 0,
-    minStock: 10,
-    location: 'Main Warehouse'
+    warehouses: []
   })
+  const [selectedWarehouses, setSelectedWarehouses] = useState([])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (editingProduct) {
-      updateProduct(editingProduct.id, formData)
-    } else {
-      addProduct(formData)
+    const productData = {
+      ...formData,
+      warehouses: selectedWarehouses
     }
-    closeModal()
+    console.log('Submitting product data:', productData)
+    
+    try {
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, productData)
+      } else {
+        await addProduct(productData)
+      }
+      closeModal()
+    } catch (error) {
+      console.error('=== PRODUCT SUBMIT ERROR ===')
+      console.error('Error object:', error)
+      console.error('Error message:', error.message)
+      console.error('Product data sent:', productData)
+      console.error('===========================')
+      alert(`Failed to save product: ${error.message}`)
+    }
   }
 
   const openModal = (product = null) => {
+    console.log('Available warehouses:', warehouses) // Debug log
     if (product) {
       setEditingProduct(product)
       setFormData(product)
+      setSelectedWarehouses(product.warehouses || [])
     } else {
       setEditingProduct(null)
       setFormData({
@@ -50,12 +66,36 @@ const Products = () => {
         sku: '',
         category: 'raw',
         unitOfMeasure: 'units',
-        stock: 0,
-        minStock: 10,
-        location: 'Main Warehouse'
+        warehouses: []
       })
+      setSelectedWarehouses([])
     }
     setIsModalOpen(true)
+  }
+
+  const addWarehouseToProduct = () => {
+    if (warehouses.length > 0) {
+      const availableWarehouse = warehouses.find(
+        wh => !selectedWarehouses.some(sw => sw.warehouseName === wh.name)
+      )
+      if (availableWarehouse) {
+        setSelectedWarehouses([...selectedWarehouses, {
+          warehouseName: availableWarehouse.name,
+          stock: 0,
+          minStock: 10
+        }])
+      }
+    }
+  }
+
+  const removeWarehouseFromProduct = (index) => {
+    setSelectedWarehouses(selectedWarehouses.filter((_, i) => i !== index))
+  }
+
+  const updateWarehouseData = (index, field, value) => {
+    const updated = [...selectedWarehouses]
+    updated[index][field] = value
+    setSelectedWarehouses(updated)
   }
 
   const closeModal = () => {
@@ -121,15 +161,16 @@ const Products = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => {
-            const isLowStock = product.stock <= product.minStock
+            const totalStock = product.warehouses?.reduce((sum, wh) => sum + wh.stock, 0) || 0
+            const hasLowStock = product.warehouses?.some(wh => wh.stock <= wh.minStock) || false
             return (
               <div key={product.id} className="card hover:shadow-lg transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                      isLowStock ? 'bg-red-100' : 'bg-primary-100'
+                      hasLowStock ? 'bg-red-100' : 'bg-primary-100'
                     }`}>
-                      <Package className={`w-6 h-6 ${isLowStock ? 'text-red-600' : 'text-primary-600'}`} />
+                      <Package className={`w-6 h-6 ${hasLowStock ? 'text-red-600' : 'text-primary-600'}`} />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{product.name}</h3>
@@ -164,25 +205,33 @@ const Products = () => {
                     <span className="font-medium">{getCategoryName(product.category)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Location:</span>
-                    <span className="font-medium">{product.location}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Stock:</span>
-                    <span className={`font-bold ${isLowStock ? 'text-red-600' : 'text-green-600'}`}>
-                      {product.stock} {product.unitOfMeasure}
+                    <span className="text-gray-600">Total Stock:</span>
+                    <span className={`font-bold ${hasLowStock ? 'text-red-600' : 'text-green-600'}`}>
+                      {totalStock} {product.unitOfMeasure}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Min Stock:</span>
-                    <span className="font-medium">{product.minStock} {product.unitOfMeasure}</span>
+                  <div className="text-sm">
+                    <span className="text-gray-600 block mb-1">Warehouses:</span>
+                    <div className="space-y-1">
+                      {product.warehouses?.map((wh, idx) => {
+                        const isLow = wh.stock <= wh.minStock
+                        return (
+                          <div key={idx} className="flex justify-between text-xs pl-2">
+                            <span className="text-gray-600">{wh.warehouseName}:</span>
+                            <span className={`font-medium ${isLow ? 'text-red-600' : 'text-gray-900'}`}>
+                              {wh.stock} / {wh.minStock} min
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
                 </div>
 
-                {isLowStock && (
+                {hasLowStock && (
                   <div className="mt-4 p-2 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-red-600" />
-                    <span className="text-xs text-red-700 font-medium">Low Stock Alert!</span>
+                    <span className="text-xs text-red-700 font-medium">Low Stock in Some Warehouses!</span>
                   </div>
                 )}
               </div>
@@ -269,48 +318,86 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Initial Stock
-                </label>
-                <input
-                  type="number"
-                  value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })}
-                  className="input"
-                  min="0"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Minimum Stock
-                </label>
-                <input
-                  type="number"
-                  value={formData.minStock}
-                  onChange={(e) => setFormData({ ...formData, minStock: parseInt(e.target.value) || 0 })}
-                  className="input"
-                  min="0"
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location *
+                Warehouses *
               </label>
-              <select
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="input"
-                required
-              >
-                <option value="Main Warehouse">Main Warehouse</option>
-                <option value="Production Floor">Production Floor</option>
-                <option value="Warehouse 2">Warehouse 2</option>
-              </select>
+              <div className="space-y-3">
+                {selectedWarehouses.map((wh, index) => (
+                  <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <select
+                        value={wh.warehouseName}
+                        onChange={(e) => updateWarehouseData(index, 'warehouseName', e.target.value)}
+                        className="input text-sm flex-1 mr-2"
+                        required
+                      >
+                        <option value="">Select warehouse</option>
+                        {warehouses && warehouses.length > 0 ? (
+                          warehouses.map((warehouse) => (
+                            <option 
+                              key={warehouse.id} 
+                              value={warehouse.name}
+                              disabled={selectedWarehouses.some((sw, i) => i !== index && sw.warehouseName === warehouse.name)}
+                            >
+                              {warehouse.name}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="" disabled>No warehouses available</option>
+                        )}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => removeWarehouseFromProduct(index)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs text-gray-600">Initial Stock</label>
+                        <input
+                          type="number"
+                          value={wh.stock}
+                          onChange={(e) => updateWarehouseData(index, 'stock', parseInt(e.target.value) || 0)}
+                          className="input text-sm mt-1"
+                          min="0"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">Min Stock</label>
+                        <input
+                          type="number"
+                          value={wh.minStock}
+                          onChange={(e) => updateWarehouseData(index, 'minStock', parseInt(e.target.value) || 0)}
+                          className="input text-sm mt-1"
+                          min="0"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {warehouses.length > 0 && selectedWarehouses.length < warehouses.length && (
+                  <button
+                    type="button"
+                    onClick={addWarehouseToProduct}
+                    className="btn btn-secondary text-sm w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Add Warehouse
+                  </button>
+                )}
+                {warehouses.length === 0 && (
+                  <p className="text-sm text-red-500 italic">No warehouses available. Please add warehouses first.</p>
+                )}
+                {selectedWarehouses.length === 0 && warehouses.length > 0 && (
+                  <p className="text-sm text-gray-500 italic">Add at least one warehouse</p>
+                )}
+              </div>
             </div>
           </div>
 

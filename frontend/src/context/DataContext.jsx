@@ -1,5 +1,14 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { initializeDemoData, getFromStorage, saveToStorage } from '../utils/storage'
+import { 
+  productsAPI, 
+  warehousesAPI, 
+  receiptsAPI, 
+  deliveriesAPI, 
+  transfersAPI, 
+  adjustmentsAPI, 
+  historyAPI 
+} from '../services/api'
+import { normalizeItems } from '../utils/helpers'
 
 const DataContext = createContext(null)
 
@@ -11,236 +20,238 @@ export const DataProvider = ({ children }) => {
   const [adjustments, setAdjustments] = useState([])
   const [history, setHistory] = useState([])
   const [warehouses, setWarehouses] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Always initialize from centralized JSON to ensure consistency
-    if (!localStorage.getItem('stockmaster_initialized')) {
-      initializeDemoData()
-    }
     loadData()
   }, [])
 
-  const loadData = () => {
-    setProducts(getFromStorage('products'))
-    setReceipts(getFromStorage('receipts'))
-    setDeliveries(getFromStorage('deliveries'))
-    setTransfers(getFromStorage('transfers'))
-    setAdjustments(getFromStorage('adjustments'))
-    setHistory(getFromStorage('history'))
-    setWarehouses(getFromStorage('warehouses'))
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const [
+        productsData,
+        warehousesData,
+        receiptsData,
+        deliveriesData,
+        transfersData,
+        adjustmentsData,
+        historyData
+      ] = await Promise.all([
+        productsAPI.getAll(),
+        warehousesAPI.getAll(),
+        receiptsAPI.getAll(),
+        deliveriesAPI.getAll(),
+        transfersAPI.getAll(),
+        adjustmentsAPI.getAll(),
+        historyAPI.getAll({ limit: 100 })
+      ])
+
+      // Normalize data to use consistent 'id' field
+      setProducts(normalizeItems(productsData.data || []))
+      setWarehouses(normalizeItems(warehousesData.data || []))
+      setReceipts(normalizeItems(receiptsData.data || []))
+      setDeliveries(normalizeItems(deliveriesData.data || []))
+      setTransfers(normalizeItems(transfersData.data || []))
+      setAdjustments(normalizeItems(adjustmentsData.data || []))
+      setHistory(normalizeItems(historyData.data || []))
+    } catch (error) {
+      console.error('Error loading data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Product operations
-  const addProduct = (product) => {
-    const newProduct = {
-      ...product,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+  const addProduct = async (product) => {
+    try {
+      const response = await productsAPI.create(product)
+      if (response.success) {
+        setProducts([...products, response.data])
+        await loadData() // Refresh all data
+        return response.data
+      }
+    } catch (error) {
+      console.error('Error adding product:', error)
+      throw error
     }
-    const updated = [...products, newProduct]
-    setProducts(updated)
-    saveToStorage('products', updated)
-    addToHistory('create', 'product', newProduct)
-    return newProduct
   }
 
-  const updateProduct = (id, updates) => {
-    const updated = products.map(p => p.id === id ? { ...p, ...updates } : p)
-    setProducts(updated)
-    saveToStorage('products', updated)
-    addToHistory('update', 'product', { id, ...updates })
+  const updateProduct = async (id, updates) => {
+    try {
+      // Use _id for API call (MongoDB ID)
+      const mongoId = products.find(p => p.id === id)?._id || id
+      const response = await productsAPI.update(mongoId, updates)
+      if (response.success) {
+        await loadData()
+      }
+    } catch (error) {
+      console.error('Error updating product:', error)
+      throw error
+    }
   }
 
-  const deleteProduct = (id) => {
-    const updated = products.filter(p => p.id !== id)
-    setProducts(updated)
-    saveToStorage('products', updated)
-    addToHistory('delete', 'product', { id })
+  const deleteProduct = async (id) => {
+    try {
+      // Use _id for API call (MongoDB ID)
+      const mongoId = products.find(p => p.id === id)?._id || id
+      const response = await productsAPI.delete(mongoId)
+      if (response.success) {
+        await loadData()
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error)
+      throw error
+    }
   }
 
   // Warehouse operations
-  const addWarehouse = (warehouse) => {
-    const newWarehouse = {
-      ...warehouse,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+  const addWarehouse = async (warehouse) => {
+    try {
+      const response = await warehousesAPI.create(warehouse)
+      if (response.success) {
+        setWarehouses([...warehouses, response.data])
+        await loadData()
+        return response.data
+      }
+    } catch (error) {
+      console.error('Error adding warehouse:', error)
+      throw error
     }
-    const updated = [...warehouses, newWarehouse]
-    setWarehouses(updated)
-    saveToStorage('warehouses', updated)
-    addToHistory('create', 'warehouse', newWarehouse)
-    return newWarehouse
   }
 
-  const updateWarehouse = (id, updates) => {
-    const updated = warehouses.map(w => w.id === id ? { ...w, ...updates } : w)
-    setWarehouses(updated)
-    saveToStorage('warehouses', updated)
-    addToHistory('update', 'warehouse', { id, ...updates })
+  const updateWarehouse = async (id, updates) => {
+    try {
+      const mongoId = warehouses.find(w => w.id === id)?._id || id
+      const response = await warehousesAPI.update(mongoId, updates)
+      if (response.success) {
+        await loadData()
+      }
+    } catch (error) {
+      console.error('Error updating warehouse:', error)
+      throw error
+    }
   }
 
-  const deleteWarehouse = (id) => {
-    const updated = warehouses.filter(w => w.id !== id)
-    setWarehouses(updated)
-    saveToStorage('warehouses', updated)
-    addToHistory('delete', 'warehouse', { id })
+  const deleteWarehouse = async (id) => {
+    try {
+      const mongoId = warehouses.find(w => w.id === id)?._id || id
+      const response = await warehousesAPI.delete(mongoId)
+      if (response.success) {
+        await loadData()
+      }
+    } catch (error) {
+      console.error('Error deleting warehouse:', error)
+      throw error
+    }
   }
 
   // Receipt operations
-  const addReceipt = (receipt) => {
-    const newReceipt = {
-      ...receipt,
-      id: `RCP-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      status: receipt.status || 'draft'
+  const addReceipt = async (receipt) => {
+    try {
+      const response = await receiptsAPI.create(receipt)
+      if (response.success) {
+        setReceipts([...receipts, response.data])
+        await loadData()
+        return response.data
+      }
+    } catch (error) {
+      console.error('Error adding receipt:', error)
+      throw error
     }
-    const updated = [...receipts, newReceipt]
-    setReceipts(updated)
-    saveToStorage('receipts', updated)
-    addToHistory('create', 'receipt', newReceipt)
-    return newReceipt
   }
 
-  const updateReceipt = (id, updates) => {
-    const updated = receipts.map(r => r.id === id ? { ...r, ...updates } : r)
-    setReceipts(updated)
-    saveToStorage('receipts', updated)
-    
-    // If validated, update product stock
-    if (updates.status === 'done') {
-      const receipt = receipts.find(r => r.id === id)
-      if (receipt && receipt.items) {
-        receipt.items.forEach(item => {
-          updateProductStock(item.productId, item.quantity, 'add', receipt.warehouse)
-        })
+  const updateReceipt = async (id, updates) => {
+    try {
+      const mongoId = receipts.find(r => r.id === id)?._id || id
+      // Use updateStatus endpoint if only status is being updated
+      if (updates.status && Object.keys(updates).length === 1) {
+        const response = await receiptsAPI.updateStatus(mongoId, updates.status)
+        if (response.success) {
+          await loadData() // Refresh to get updated stock
+        }
       }
+    } catch (error) {
+      console.error('Error updating receipt:', error)
+      throw error
     }
-    
-    addToHistory('update', 'receipt', { id, ...updates })
   }
 
   // Delivery operations
-  const addDelivery = (delivery) => {
-    const newDelivery = {
-      ...delivery,
-      id: `DEL-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      status: delivery.status || 'draft'
+  const addDelivery = async (delivery) => {
+    try {
+      const response = await deliveriesAPI.create(delivery)
+      if (response.success) {
+        setDeliveries([...deliveries, response.data])
+        await loadData()
+        return response.data
+      }
+    } catch (error) {
+      console.error('Error adding delivery:', error)
+      throw error
     }
-    const updated = [...deliveries, newDelivery]
-    setDeliveries(updated)
-    saveToStorage('deliveries', updated)
-    addToHistory('create', 'delivery', newDelivery)
-    return newDelivery
   }
 
-  const updateDelivery = (id, updates) => {
-    const updated = deliveries.map(d => d.id === id ? { ...d, ...updates } : d)
-    setDeliveries(updated)
-    saveToStorage('deliveries', updated)
-    
-    // If validated, update product stock
-    if (updates.status === 'done') {
-      const delivery = deliveries.find(d => d.id === id)
-      if (delivery && delivery.items) {
-        delivery.items.forEach(item => {
-          updateProductStock(item.productId, item.quantity, 'subtract', delivery.warehouse)
-        })
+  const updateDelivery = async (id, updates) => {
+    try {
+      const mongoId = deliveries.find(d => d.id === id)?._id || id
+      // Use updateStatus endpoint if only status is being updated
+      if (updates.status && Object.keys(updates).length === 1) {
+        const response = await deliveriesAPI.updateStatus(mongoId, updates.status)
+        if (response.success) {
+          await loadData() // Refresh to get updated stock
+        }
       }
+    } catch (error) {
+      console.error('Error updating delivery:', error)
+      throw error
     }
-    
-    addToHistory('update', 'delivery', { id, ...updates })
   }
 
   // Transfer operations
-  const addTransfer = (transfer) => {
-    const newTransfer = {
-      ...transfer,
-      id: `TRF-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      status: transfer.status || 'draft'
+  const addTransfer = async (transfer) => {
+    try {
+      const response = await transfersAPI.create(transfer)
+      if (response.success) {
+        setTransfers([...transfers, response.data])
+        await loadData()
+        return response.data
+      }
+    } catch (error) {
+      console.error('Error adding transfer:', error)
+      throw error
     }
-    const updated = [...transfers, newTransfer]
-    setTransfers(updated)
-    saveToStorage('transfers', updated)
-    addToHistory('create', 'transfer', newTransfer)
-    return newTransfer
   }
 
-  const updateTransfer = (id, updates) => {
-    const updated = transfers.map(t => t.id === id ? { ...t, ...updates } : t)
-    setTransfers(updated)
-    saveToStorage('transfers', updated)
-    
-    // If validated, update location
-    if (updates.status === 'done') {
-      const transfer = transfers.find(t => t.id === id)
-      if (transfer) {
-        // Update product location without changing total quantity
-        updateProductLocation(transfer.productId, transfer.fromLocation, transfer.toLocation, transfer.quantity)
+  const updateTransfer = async (id, updates) => {
+    try {
+      const mongoId = transfers.find(t => t.id === id)?._id || id
+      // Use updateStatus endpoint if only status is being updated
+      if (updates.status && Object.keys(updates).length === 1) {
+        const response = await transfersAPI.updateStatus(mongoId, updates.status)
+        if (response.success) {
+          await loadData() // Refresh to get updated data
+        }
       }
+    } catch (error) {
+      console.error('Error updating transfer:', error)
+      throw error
     }
-    
-    addToHistory('update', 'transfer', { id, ...updates })
   }
 
   // Adjustment operations
-  const addAdjustment = (adjustment) => {
-    const newAdjustment = {
-      ...adjustment,
-      id: `ADJ-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      status: 'done'
-    }
-    
-    // Update stock immediately
-    const product = products.find(p => p.id === adjustment.productId)
-    if (product) {
-      const currentStock = product.stock || 0
-      const difference = adjustment.newQuantity - currentStock
-      updateProductStock(adjustment.productId, Math.abs(difference), difference > 0 ? 'add' : 'subtract', adjustment.location)
-    }
-    
-    const updated = [...adjustments, newAdjustment]
-    setAdjustments(updated)
-    saveToStorage('adjustments', updated)
-    addToHistory('create', 'adjustment', newAdjustment)
-    return newAdjustment
-  }
-
-  // Helper: Update product stock
-  const updateProductStock = (productId, quantity, operation, location) => {
-    const updated = products.map(p => {
-      if (p.id === productId) {
-        const currentStock = p.stock || 0
-        const newStock = operation === 'add' 
-          ? currentStock + quantity 
-          : currentStock - quantity
-        return { ...p, stock: Math.max(0, newStock) }
+  const addAdjustment = async (adjustment) => {
+    try {
+      const response = await adjustmentsAPI.create(adjustment)
+      if (response.success) {
+        setAdjustments([...adjustments, response.data])
+        await loadData() // Refresh to get updated stock
+        return response.data
       }
-      return p
-    })
-    setProducts(updated)
-    saveToStorage('products', updated)
-  }
-
-  const updateProductLocation = (productId, fromLocation, toLocation, quantity) => {
-    // In a real app, this would update location-specific stock
-    addToHistory('move', 'product', { productId, fromLocation, toLocation, quantity })
-  }
-
-  // History
-  const addToHistory = (action, type, data) => {
-    const entry = {
-      id: Date.now().toString(),
-      action,
-      type,
-      data,
-      timestamp: new Date().toISOString()
+    } catch (error) {
+      console.error('Error adding adjustment:', error)
+      throw error
     }
-    const updated = [entry, ...history].slice(0, 100) // Keep last 100 entries
-    setHistory(updated)
-    saveToStorage('history', updated)
   }
 
   const value = {
@@ -251,6 +262,7 @@ export const DataProvider = ({ children }) => {
     adjustments,
     history,
     warehouses,
+    loading,
     addProduct,
     updateProduct,
     deleteProduct,

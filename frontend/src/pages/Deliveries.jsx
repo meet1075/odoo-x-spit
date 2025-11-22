@@ -11,7 +11,7 @@ import { Plus, Upload, Check, X, Package } from 'lucide-react'
 
 const Deliveries = () => {
   const { user } = useAuth()
-  const { deliveries, products, addDelivery, updateDelivery } = useData()
+  const { deliveries, products, warehouses, addDelivery, updateDelivery } = useData()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [showCompleted, setShowCompleted] = useState(false)
@@ -19,9 +19,14 @@ const Deliveries = () => {
   const canProcess = hasPermission(user?.role, PERMISSIONS.PROCESS_DELIVERY)
   const [formData, setFormData] = useState({
     customer: '',
-    warehouse: 'Main Warehouse',
+    warehouse: '',
     items: [{ productId: '', quantity: 0 }]
   })
+
+  // Filter products based on selected warehouse
+  const availableProducts = formData.warehouse 
+    ? products.filter(p => p.warehouses?.some(wh => wh.warehouseName === formData.warehouse))
+    : []
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -49,10 +54,18 @@ const Deliveries = () => {
   const openModal = () => {
     setFormData({
       customer: '',
-      warehouse: 'Main Warehouse',
+      warehouse: warehouses.length > 0 ? warehouses[0].name : '',
       items: [{ productId: '', quantity: 0 }]
     })
     setIsModalOpen(true)
+  }
+
+  const handleWarehouseChange = (warehouseName) => {
+    setFormData({
+      ...formData,
+      warehouse: warehouseName,
+      items: [{ productId: '', quantity: 0 }] // Reset items when warehouse changes
+    })
   }
 
   const closeModal = () => {
@@ -286,13 +299,16 @@ const Deliveries = () => {
               </label>
               <select
                 value={formData.warehouse}
-                onChange={(e) => setFormData({ ...formData, warehouse: e.target.value })}
+                onChange={(e) => handleWarehouseChange(e.target.value)}
                 className="input"
                 required
               >
-                <option value="Main Warehouse">Main Warehouse</option>
-                <option value="Production Floor">Production Floor</option>
-                <option value="Warehouse 2">Warehouse 2</option>
+                <option value="">Select warehouse</option>
+                {warehouses.map((warehouse) => (
+                  <option key={warehouse.id} value={warehouse.name}>
+                    {warehouse.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -300,6 +316,11 @@ const Deliveries = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Products *
               </label>
+              {!formData.warehouse && (
+                <p className="text-sm text-gray-500 mb-2 italic">
+                  Please select a warehouse first to see available products
+                </p>
+              )}
               {formData.items.map((item, index) => (
                 <div key={index} className="flex gap-2 mb-2">
                   <select
@@ -307,13 +328,18 @@ const Deliveries = () => {
                     onChange={(e) => updateItem(index, 'productId', e.target.value)}
                     className="input flex-1"
                     required
+                    disabled={!formData.warehouse}
                   >
                     <option value="">Select Product</option>
-                    {products.map(p => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} ({p.sku}) - Stock: {p.stock}
-                      </option>
-                    ))}
+                    {availableProducts.map(p => {
+                      const warehouseStock = p.warehouses?.find(wh => wh.warehouseName === formData.warehouse)
+                      const stock = warehouseStock?.stock || 0
+                      return (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.sku}) - Stock: {stock}
+                        </option>
+                      )
+                    })}
                   </select>
                   <input
                     type="number"

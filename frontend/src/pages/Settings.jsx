@@ -343,13 +343,13 @@ const Settings = () => {
         isOpen={showWarehouseModal}
         onClose={closeWarehouseModal}
         title={editingWarehouse ? 'Edit Warehouse' : 'Add New Warehouse'}
-        size="large"
+        size="md"
       >
         <form onSubmit={handleWarehouseSubmit} className="space-y-6">
           {/* Basic Information */}
           <div>
             <h4 className="font-semibold text-gray-900 mb-4">Basic Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Warehouse Name <span className="text-red-500">*</span>
@@ -376,24 +376,6 @@ const Settings = () => {
                   placeholder="e.g., Building A"
                   required
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Warehouse Type <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={warehouseForm.type}
-                  onChange={(e) => setWarehouseForm({ ...warehouseForm, type: e.target.value })}
-                  className="input"
-                  required
-                >
-                  <option value="main">Main Warehouse</option>
-                  <option value="distribution">Distribution Center</option>
-                  <option value="production">Production Floor</option>
-                  <option value="retail">Retail Store</option>
-                  <option value="storage">Storage Facility</option>
-                </select>
               </div>
 
               <div>
@@ -481,7 +463,7 @@ const Settings = () => {
           {/* Contact Information */}
           <div>
             <h4 className="font-semibold text-gray-900 mb-4">Contact Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Contact Person

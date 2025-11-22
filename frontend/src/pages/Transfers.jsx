@@ -1,18 +1,27 @@
 import { useState } from 'react'
 import { useData } from '../context/DataContext'
+import { useAuth } from '../context/AuthContext'
 import Layout from '../components/Layout'
 import Modal from '../components/Modal'
+import PermissionGuard from '../components/PermissionGuard'
 import { formatDateTime, getStatusColor } from '../utils/storage'
-import { Plus, Repeat, Check, X, ArrowRight } from 'lucide-react'
+import { hasPermission } from '../utils/permissions'
+import { PERMISSIONS } from '../utils/permissions'
+import { Plus, Repeat, Check, X, ArrowRight, Clock } from 'lucide-react'
 
 const Transfers = () => {
-  const { transfers, products, addTransfer, updateTransfer } = useData()
+  const { user } = useAuth()
+  const { transfers, products, warehouses, addTransfer, updateTransfer } = useData()
+  const canCreate = hasPermission(user?.role, PERMISSIONS.CREATE_TRANSFER)
+  const canProcess = hasPermission(user?.role, PERMISSIONS.PROCESS_TRANSFER)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [showCompleted, setShowCompleted] = useState(false)
   const [formData, setFormData] = useState({
     productId: '',
     quantity: 0,
-    fromLocation: 'Main Warehouse',
-    toLocation: 'Production Floor'
+    fromLocation: '',
+    toLocation: ''
   })
 
   const handleSubmit = (e) => {
@@ -35,8 +44,8 @@ const Transfers = () => {
     setFormData({
       productId: '',
       quantity: 0,
-      fromLocation: 'Main Warehouse',
-      toLocation: 'Production Floor'
+      fromLocation: warehouses.length > 0 ? warehouses[0].name : '',
+      toLocation: warehouses.length > 1 ? warehouses[1].name : ''
     })
     setIsModalOpen(true)
   }
@@ -47,23 +56,101 @@ const Transfers = () => {
 
   const handleStatusUpdate = (id, status) => {
     updateTransfer(id, { status })
+    const statusMessages = {
+      waiting: 'Transfer started',
+      ready: 'Transfer ready for completion',
+      done: 'Transfer completed! Stock moved between warehouses.',
+      canceled: 'Transfer canceled'
+    }
+    setSuccessMessage(statusMessages[status] || 'Status updated')
+    setTimeout(() => setSuccessMessage(''), 3000)
   }
 
-  const locations = ['Main Warehouse', 'Production Floor', 'Warehouse 2', 'Rack A', 'Rack B']
+  // Separate pending and completed transfers
+  const pendingTransfers = transfers.filter(t => t.status !== 'done' && t.status !== 'canceled')
+  const completedTransfers = transfers.filter(t => t.status === 'done' || t.status === 'canceled')
 
   return (
     <Layout>
       <div className="p-8">
+        {successMessage && (
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg flex items-center gap-2 animate-pulse">
+            <Check className="w-5 h-5" />
+            {successMessage}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Internal Transfers</h1>
-            <p className="text-gray-500 mt-1">Move stock between warehouses and locations</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {user?.role === 'staff' ? 'Internal Transfers' : 'Internal Transfers'}
+            </h1>
+            <p className="text-gray-500 mt-1">
+              {user?.role === 'staff' 
+                ? 'Process stock movements between warehouses' 
+                : 'Create and manage stock movements between warehouses'}
+            </p>
           </div>
-          <button onClick={openModal} className="btn btn-primary flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            New Transfer
+          <PermissionGuard permission={PERMISSIONS.CREATE_TRANSFER}>
+            <button onClick={openModal} className="btn btn-primary flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              New Transfer
+            </button>
+          </PermissionGuard>
+        </div>
+
+        <div className="mb-4 flex gap-2">
+          <button
+            onClick={() => setShowCompleted(false)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              !showCompleted ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Pending ({pendingTransfers.length})
+          </button>
+          <button
+            onClick={() => setShowCompleted(true)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              showCompleted ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Completed ({completedTransfers.length})
           </button>
         </div>
+
+        {/* Workflow Info for Staff */}
+        {user?.role === 'staff' && (
+          <div className="mb-6 card bg-purple-50 border border-purple-200">
+            <h3 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+              <Repeat className="w-5 h-5" />
+              Transfer Workflow Guide
+            </h3>
+            <div className="flex items-center gap-4 text-sm text-purple-800 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="badge badge-draft">Draft</span>
+                <span className="text-xs">Created by manager</span>
+              </div>
+              <span>→</span>
+              <div className="flex items-center gap-2">
+                <span className="badge badge-waiting">In Progress</span>
+                <span className="text-xs">Moving items</span>
+              </div>
+              <span>→</span>
+              <div className="flex items-center gap-2">
+                <span className="badge badge-ready">Ready</span>
+                <span className="text-xs">Items moved, ready to confirm</span>
+              </div>
+              <span>→</span>
+              <div className="flex items-center gap-2">
+                <span className="badge badge-done">Complete</span>
+                <span className="text-xs font-semibold">Stock locations updated ✓</span>
+              </div>
+            </div>
+            <p className="text-xs text-purple-700 mt-3">
+              💡 <strong>Your role:</strong> Execute transfers by moving items between locations and confirm completion.
+            </p>
+          </div>
+        )}
 
         <div className="card">
           <div className="overflow-x-auto">
@@ -80,14 +167,14 @@ const Transfers = () => {
                 </tr>
               </thead>
               <tbody>
-                {transfers.length === 0 ? (
+                {(showCompleted ? completedTransfers : pendingTransfers).length === 0 ? (
                   <tr>
                     <td colSpan="7" className="text-center py-8 text-gray-500">
-                      No transfers found. Create your first internal transfer!
+                      {showCompleted ? 'No completed transfers' : 'No pending transfers'}
                     </td>
                   </tr>
                 ) : (
-                  transfers.map((transfer) => (
+                  (showCompleted ? completedTransfers : pendingTransfers).map((transfer) => (
                     <tr key={transfer.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-4 text-sm font-medium">{transfer.id}</td>
                       <td className="py-3 px-4 text-sm">{transfer.productName}</td>
@@ -112,14 +199,14 @@ const Transfers = () => {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        {transfer.status !== 'done' && transfer.status !== 'canceled' && (
+                        {user?.role === 'staff' && transfer.status !== 'done' && transfer.status !== 'canceled' && (
                           <div className="flex gap-2">
                             {transfer.status === 'draft' && (
                               <button
                                 onClick={() => handleStatusUpdate(transfer.id, 'waiting')}
                                 className="text-xs px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
                               >
-                                Start
+                                Start Transfer
                               </button>
                             )}
                             {transfer.status === 'waiting' && (
@@ -127,7 +214,7 @@ const Transfers = () => {
                                 onClick={() => handleStatusUpdate(transfer.id, 'ready')}
                                 className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
                               >
-                                Ready
+                                Mark Ready
                               </button>
                             )}
                             {transfer.status === 'ready' && (
@@ -148,6 +235,9 @@ const Transfers = () => {
                             </button>
                           </div>
                         )}
+                        {user?.role === 'manager' && (
+                          <span className="text-xs text-gray-500 italic">Staff will process</span>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -157,19 +247,21 @@ const Transfers = () => {
           </div>
         </div>
 
-        {/* Info Card */}
-        <div className="mt-6 card bg-purple-50 border border-purple-200">
-          <h3 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
-            <Repeat className="w-5 h-5" />
-            How Internal Transfers Work
-          </h3>
-          <ul className="text-sm text-purple-800 space-y-1">
-            <li>• Move stock between warehouses, production floors, or specific locations</li>
-            <li>• Total stock quantity remains unchanged</li>
-            <li>• Location is updated when transfer is completed</li>
-            <li>• All movements are logged in the stock ledger</li>
-          </ul>
-        </div>
+        {/* Info Card - Only for Manager */}
+        {user?.role === 'manager' && (
+          <div className="mt-6 card bg-purple-50 border border-purple-200">
+            <h3 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+              <Repeat className="w-5 h-5" />
+              How Internal Transfers Work
+            </h3>
+            <ul className="text-sm text-purple-800 space-y-1">
+              <li>• Move stock between warehouses or specific locations</li>
+              <li>• Total stock quantity remains unchanged</li>
+              <li>• Stock locations are updated when transfer is completed by staff</li>
+              <li>• All movements are logged in the stock history</li>
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Add Modal */}
@@ -220,8 +312,9 @@ const Transfers = () => {
                 className="input"
                 required
               >
-                {locations.map(loc => (
-                  <option key={loc} value={loc}>{loc}</option>
+                <option value="">Select warehouse</option>
+                {warehouses.map(warehouse => (
+                  <option key={warehouse.id} value={warehouse.name}>{warehouse.name}</option>
                 ))}
               </select>
             </div>
@@ -236,8 +329,9 @@ const Transfers = () => {
                 className="input"
                 required
               >
-                {locations.filter(loc => loc !== formData.fromLocation).map(loc => (
-                  <option key={loc} value={loc}>{loc}</option>
+                <option value="">Select warehouse</option>
+                {warehouses.filter(warehouse => warehouse.name !== formData.fromLocation).map(warehouse => (
+                  <option key={warehouse.id} value={warehouse.name}>{warehouse.name}</option>
                 ))}
               </select>
             </div>
