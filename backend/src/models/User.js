@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    trim: true
+    trim: true,
   },
   isActive: {
     type: Boolean,
