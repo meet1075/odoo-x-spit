@@ -1,0 +1,308 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Steel Rods",
+      "sku": "STL-001",
+      "category": "raw",
+      "unitOfMeasure": "kg",
+      "stock": 150,
+      "minStock": 50,
+      "location": "Main Warehouse",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "Office Chairs",
+      "sku": "CHR-001",
+      "category": "finished",
+      "unitOfMeasure": "units",
+      "stock": 45,
+      "minStock": 20,
+      "location": "Main Warehouse",
+      "createdAt": "2025-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "name": "Plastic Sheets",
+      "sku": "PLS-001",
+      "category": "raw",
+      "unitOfMeasure": "sheets",
+      "stock": 200,
+      "minStock": 100,
+      "location": "Production Floor",
+      "createdAt": "2025-03-05T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "name": "Wooden Planks",
+      "sku": "WD-001",
+      "category": "raw",
+      "unitOfMeasure": "pieces",
+      "stock": 80,
+      "minStock": 30,
+      "location": "Main Warehouse",
+      "createdAt": "2025-01-20T00:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "name": "Desktop Computers",
+      "sku": "CMP-001",
+      "category": "finished",
+      "unitOfMeasure": "units",
+      "stock": 15,
+      "minStock": 10,
+      "location": "Distribution Center East",
+      "createdAt": "2025-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "name": "Cleaning Supplies",
+      "sku": "CLN-001",
+      "category": "consumables",
+      "unitOfMeasure": "boxes",
+      "stock": 8,
+      "minStock": 15,
+      "location": "Main Warehouse",
+      "createdAt": "2025-03-01T00:00:00.000Z"
+    }
+  ],
+  "receipts": [
+    {
+      "id": "RCP-1000",
+      "supplier": "Steel Suppliers Inc.",
+      "warehouse": "Main Warehouse",
+      "status": "draft",
+      "date": "2025-11-20T00:00:00.000Z",
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Steel Rods",
+          "quantity": 100,
+          "unit": "kg"
+        }
+      ],
+      "createdAt": "2025-11-20T00:00:00.000Z"
+    },
+    {
+      "id": "RCP-1001",
+      "supplier": "Furniture Wholesale",
+      "warehouse": "Main Warehouse",
+      "status": "waiting",
+      "date": "2025-11-21T00:00:00.000Z",
+      "items": [
+        {
+          "productId": "2",
+          "productName": "Office Chairs",
+          "quantity": 30,
+          "unit": "units"
+        }
+      ],
+      "createdAt": "2025-11-21T00:00:00.000Z"
+    },
+    {
+      "id": "RCP-1002",
+      "supplier": "Plastic Materials Co.",
+      "warehouse": "Production Floor",
+      "status": "ready",
+      "date": "2025-11-22T00:00:00.000Z",
+      "items": [
+        {
+          "productId": "3",
+          "productName": "Plastic Sheets",
+          "quantity": 150,
+          "unit": "sheets"
+        }
+      ],
+      "createdAt": "2025-11-22T00:00:00.000Z"
+    }
+  ],
+  "deliveries": [
+    {
+      "id": "DEL-2000",
+      "customer": "ABC Manufacturing",
+      "warehouse": "Main Warehouse",
+      "status": "draft",
+      "date": "2025-11-20T00:00:00.000Z",
+      "items": [
+        {
+          "productId": "2",
+          "productName": "Office Chairs",
+          "quantity": 10,
+          "unit": "units"
+        }
+      ],
+      "createdAt": "2025-11-20T00:00:00.000Z"
+    },
+    {
+      "id": "DEL-2001",
+      "customer": "XYZ Corp",
+      "warehouse": "Main Warehouse",
+      "status": "waiting",
+      "date": "2025-11-21T00:00:00.000Z",
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Steel Rods",
+          "quantity": 20,
+          "unit": "kg"
+        },
+        {
+          "productId": "4",
+          "productName": "Wooden Planks",
+          "quantity": 15,
+          "unit": "pieces"
+        }
+      ],
+      "createdAt": "2025-11-21T00:00:00.000Z"
+    },
+    {
+      "id": "DEL-2002",
+      "customer": "Tech Solutions Ltd",
+      "warehouse": "Distribution Center East",
+      "status": "ready",
+      "date": "2025-11-22T00:00:00.000Z",
+      "items": [
+        {
+          "productId": "5",
+          "productName": "Desktop Computers",
+          "quantity": 5,
+          "unit": "units"
+        }
+      ],
+      "createdAt": "2025-11-22T00:00:00.000Z"
+    }
+  ],
+  "transfers": [
+    {
+      "id": "TRF-3000",
+      "productId": "1",
+      "productName": "Steel Rods",
+      "quantity": 50,
+      "fromLocation": "Main Warehouse",
+      "toLocation": "Production Floor",
+      "status": "waiting",
+      "date": "2025-11-21T00:00:00.000Z",
+      "createdAt": "2025-11-21T00:00:00.000Z"
+    },
+    {
+      "id": "TRF-3001",
+      "productId": "3",
+      "productName": "Plastic Sheets",
+      "quantity": 30,
+      "fromLocation": "Production Floor",
+      "toLocation": "Main Warehouse",
+      "status": "ready",
+      "date": "2025-11-22T00:00:00.000Z",
+      "createdAt": "2025-11-22T00:00:00.000Z"
+    }
+  ],
+  "adjustments": [
+    {
+      "id": "ADJ-4000",
+      "productId": "6",
+      "productName": "Cleaning Supplies",
+      "location": "Main Warehouse",
+      "oldQuantity": 10,
+      "newQuantity": 8,
+      "reason": "Physical count adjustment",
+      "status": "done",
+      "date": "2025-11-21T00:00:00.000Z",
+      "createdAt": "2025-11-21T00:00:00.000Z"
+    }
+  ],
+  "warehouses": [
+    {
+      "id": "1",
+      "name": "Main Warehouse",
+      "location": "Building A",
+      "address": "123 Industrial Blvd",
+      "city": "New York",
+      "state": "NY",
+      "zipCode": "10001",
+      "country": "USA",
+      "capacity": 10000,
+      "type": "main",
+      "contact": "John Smith",
+      "phone": "+1 212 555 0100",
+      "email": "main@stockmaster.com"
+    },
+    {
+      "id": "2",
+      "name": "Distribution Center East",
+      "location": "Building B",
+      "address": "456 Commerce Ave",
+      "city": "Boston",
+      "state": "MA",
+      "zipCode": "02101",
+      "country": "USA",
+      "capacity": 5000,
+      "type": "distribution",
+      "contact": "Sarah Johnson",
+      "phone": "+1 617 555 0200",
+      "email": "east@stockmaster.com"
+    },
+    {
+      "id": "3",
+      "name": "Production Floor",
+      "location": "Building C",
+      "address": "789 Manufacturing Dr",
+      "city": "Newark",
+      "state": "NJ",
+      "zipCode": "07102",
+      "country": "USA",
+      "capacity": 8000,
+      "type": "production",
+      "contact": "Mike Chen",
+      "phone": "+1 973 555 0300",
+      "email": "production@stockmaster.com"
+    }
+  ],
+  "history": [
+    {
+      "id": "1",
+      "action": "create",
+      "type": "receipt",
+      "data": {
+        "id": "RCP-1000",
+        "product": "Steel Rods",
+        "quantity": 100
+      },
+      "timestamp": "2025-11-20T10:30:00.000Z"
+    },
+    {
+      "id": "2",
+      "action": "create",
+      "type": "delivery",
+      "data": {
+        "id": "DEL-2000",
+        "product": "Office Chairs",
+        "quantity": 10
+      },
+      "timestamp": "2025-11-20T14:20:00.000Z"
+    },
+    {
+      "id": "3",
+      "action": "create",
+      "type": "transfer",
+      "data": {
+        "id": "TRF-3000",
+        "from": "Main Warehouse",
+        "to": "Production Floor",
+        "quantity": 50
+      },
+      "timestamp": "2025-11-21T09:15:00.000Z"
+    },
+    {
+      "id": "4",
+      "action": "create",
+      "type": "adjustment",
+      "data": {
+        "id": "ADJ-4000",
+        "product": "Cleaning Supplies",
+        "difference": -2
+      },
+      "timestamp": "2025-11-21T16:45:00.000Z"
+    }
+  ]
+}
