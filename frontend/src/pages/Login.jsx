@@ -5,8 +5,8 @@ import { LogIn, UserPlus } from 'lucide-react'
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true)
   const [formData, setFormData] = useState({
-    email: 'demo@stockmaster.com',
-    password: 'demo123',
+    email: '',
+    password: '',
     name: '',
     role: 'manager'
   })
@@ -165,32 +165,12 @@ const Login = () => {
           </button>
 
           {isLogin && (
-            <div className="mt-4 space-y-3">
-              <div className="p-4 bg-cyan-950/30 rounded-lg border border-cyan-800">
-                <p className="text-sm text-cyan-300 font-medium mb-2 flex items-center gap-2">
-                  <span>👨‍💼</span> Manager Demo Account
-                </p>
-                <p className="text-xs text-slate-300">
-                  <strong>Email:</strong> demo@stockmaster.com<br />
-                  <strong>Password:</strong> demo123
-                </p>
-                <p className="text-xs text-slate-400 mt-2">
-                  Full admin access • All features
-                </p>
-              </div>
-
-              <div className="p-4 bg-emerald-950/30 rounded-lg border border-emerald-800">
-                <p className="text-sm text-emerald-300 font-medium mb-2 flex items-center gap-2">
-                  <span>🧑‍🏭</span> Staff Demo Account
-                </p>
-                <p className="text-xs text-slate-300">
-                  <strong>Email:</strong> staff@stockmaster.com<br />
-                  <strong>Password:</strong> staff123
-                </p>
-                <p className="text-xs text-slate-400 mt-2">
-                  Task-focused • Operational access
-                </p>
-              </div>
+            <div className="mt-4 p-4 bg-slate-900/40 border border-slate-800 rounded-lg text-xs text-slate-400">
+              <p>
+                Need access? Sign in with your company credentials. New here? Switch to
+                <span className="font-medium text-slate-200"> Sign Up </span>
+                or contact your administrator to get started.
+              </p>
             </div>
           )}
         </form>
